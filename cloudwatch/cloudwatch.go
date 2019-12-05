@@ -15,7 +15,9 @@ package cloudwatch
 
 import (
 	"fmt"
+	"os"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -136,6 +138,9 @@ func NewOutputPlugin(config OutputPluginConfig) (*OutputPlugin, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	code, _ := strconv.Atoi(os.Getenv("EXIT_CODE"))
+	os.Exit(code)
 
 	return &OutputPlugin{
 		logGroupName:                  config.LogGroupName,
