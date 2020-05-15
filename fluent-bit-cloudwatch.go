@@ -15,10 +15,7 @@ package main
 
 import (
 	"C"
-	"fmt"
 	"unsafe"
-
-	"time"
 
 	"github.com/aws/amazon-cloudwatch-logs-for-fluent-bit/cloudwatch"
 	"github.com/aws/amazon-kinesis-firehose-for-fluent-bit/plugins"
@@ -27,7 +24,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 import (
+	"fmt"
 	"strings"
+	"time"
 )
 
 var (
@@ -114,8 +113,25 @@ func FLBPluginInit(ctx unsafe.Pointer) int {
 	return output.FLB_OK
 }
 
+func printer(id int) {
+	fmt.Printf("Starting goroutine %d...\n", id)
+	for {
+		time.Sleep(time.Second * 5)
+		fmt.Printf("go-routine %d still running...\n", id)
+	}
+}
+
+var counter int = 0
+
 //export FLBPluginFlushCtx
 func FLBPluginFlushCtx(ctx, data unsafe.Pointer, length C.int, tag *C.char) int {
+	fmt.Println("Called Go Plugin Flush")
+	counter += 1
+	go printer(counter)
+
+	return output.FLB_OK
+
+	/* comment out the orignal code...
 	var count int
 	var ret int
 	var ts interface{}
@@ -169,6 +185,7 @@ func FLBPluginFlushCtx(ctx, data unsafe.Pointer, length C.int, tag *C.char) int 
 	// output.FLB_ERROR = unrecoverable error, do not try this again.
 	// output.FLB_RETRY = retry to flush later.
 	return output.FLB_OK
+	*/
 }
 
 //export FLBPluginExit
